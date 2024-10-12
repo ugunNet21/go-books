@@ -50,45 +50,43 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 // UpdateBook untuk memperbarui buku
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPut {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
     var updatedBook models.Book
     if err := json.NewDecoder(r.Body).Decode(&updatedBook); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
-    mu.Lock()
-    for i, book := range books {
-        if book.ID == updatedBook.ID {
-            books[i] = updatedBook
-            mu.Unlock()
-            w.WriteHeader(http.StatusOK)
-            json.NewEncoder(w).Encode(updatedBook)
-            return
-        }
+    if err := models.UpdateBook(updatedBook); err != nil {
+        http.Error(w, "Book not found", http.StatusNotFound)
+        return
     }
-    mu.Unlock()
 
-    http.Error(w, "Book not found", http.StatusNotFound)
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(updatedBook)
 }
 
 // DeleteBook untuk menghapus buku
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
-    var bookID int
-    if err := json.NewDecoder(r.Body).Decode(&bookID); err != nil {
+    if r.Method != http.MethodDelete {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    var book models.Book
+    if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
-    mu.Lock()
-    for i, book := range books {
-        if book.ID == bookID {
-            books = append(books[:i], books[i+1:]...)
-            mu.Unlock()
-            w.WriteHeader(http.StatusNoContent)
-            return
-        }
+    if err := models.DeleteBook(book.ID); err != nil {
+        http.Error(w, "Book not found", http.StatusNotFound)
+        return
     }
-    mu.Unlock()
 
-    http.Error(w, "Book not found", http.StatusNotFound)
+    w.WriteHeader(http.StatusNoContent)
 }

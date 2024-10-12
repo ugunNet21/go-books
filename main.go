@@ -3,10 +3,26 @@ package main
 import (
     "log"
     "net/http"
-    _"go-crud-books/controllers"
+    _ "go-crud-books/controllers"
     "go-crud-books/routes"
     "go-crud-books/models"
 )
+
+// CORS middleware to allow requests from your frontend
+func cors(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+        if r.Method == http.MethodOptions {
+            w.WriteHeader(http.StatusNoContent)
+            return
+        }
+
+        next.ServeHTTP(w, r)
+    })
+}
 
 func main() {
     // Initialize the database
@@ -14,9 +30,15 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    routes.RegisterRoutes()
+
+    mux := http.NewServeMux()
+    routes.RegisterRoutes(mux) // Register routes with the mux
+
+    // Wrap the mux with CORS middleware
+    wrappedMux := cors(mux)
+
     log.Println("Server is running on :8080")
-    if err := http.ListenAndServe(":8080", nil); err != nil {
+    if err := http.ListenAndServe(":8080", wrappedMux); err != nil {
         log.Fatal(err)
     }
 }

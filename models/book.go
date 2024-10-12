@@ -52,3 +52,21 @@ func CreateBook(book Book) error {
     _, err = stmt.Exec(book.Title, book.Author)
     return err
 }
+
+func UpdateBook(book Book) error {
+    stmt, err := db.Prepare("UPDATE books SET title = ?, author = ? WHERE id = ?")
+    if err != nil {
+        return err
+    }
+    _, err = stmt.Exec(book.Title, book.Author, book.ID)
+    return err
+}
+
+func DeleteBook(id int) error {
+    stmt, err := db.Prepare("DELETE FROM books WHERE id = ?")
+    if err != nil {
+        return err
+    }
+    _, err = stmt.Exec(id)
+    return err
+}

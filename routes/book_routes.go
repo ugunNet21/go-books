@@ -2,13 +2,13 @@ package routes
 
 import (
     "net/http"
-
     "go-crud-books/controllers"
 )
 
-func RegisterRoutes() {
-    http.HandleFunc("/books", controllers.GetBooks)
-    http.HandleFunc("/books/create", controllers.CreateBook)
-    http.HandleFunc("/books/update", controllers.UpdateBook)
-    http.HandleFunc("/books/delete", controllers.DeleteBook)
+
+func RegisterRoutes(mux *http.ServeMux) {
+    mux.HandleFunc("/books", controllers.GetBooks)
+    mux.HandleFunc("/books/create", controllers.CreateBook)
+    mux.HandleFunc("/books/update", controllers.UpdateBook) // PUT request
+    mux.HandleFunc("/books/delete", controllers.DeleteBook) // DELETE request
 }
