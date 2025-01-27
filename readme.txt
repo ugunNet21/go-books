@@ -137,3 +137,18 @@ mysql> SELECT * FROM books;
 
 mysql> 
 
+
+### create migrations
+
+````
+nano ~/.bashrc
+export PATH=/home/anone/go/bin:$PATH 
+source ~/.bashrc
+go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+migrate create -ext sql -dir migrations -seq create_books_table
+migrate -database 'mysql://root:password@tcp(127.0.0.1:3306)/go_crud_books' -path ./migrations up
+migrate -database 'mysql://root:password@tcp(127.0.0.1:3306)/go_crud_books' -path ./migrations down
+migrate -database 'mysql://root:password@tcp(127.0.0.1:3306)/go_crud_books' -path ./migrations version
+migrate -database 'mysql://root:password@tcp(127.0.0.1:3306)/go_crud_books' -path ./migrations force 1
+
+````

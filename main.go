@@ -37,8 +37,8 @@ func main() {
     // Wrap the mux with CORS middleware
     wrappedMux := cors(mux)
 
-    log.Println("Server is running on :8080")
-    if err := http.ListenAndServe(":8080", wrappedMux); err != nil {
+    log.Println("Server is running on :8081")
+    if err := http.ListenAndServe(":8081", wrappedMux); err != nil {
         log.Fatal(err)
     }
 }
